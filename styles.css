@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    color: #ffcc00;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.drink {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.drink:hover {
+    transform: scale(1.05);
+}
+
+.drink h3 {
+    margin: 0;
+    color: #ffcc00;
+}
+
+.drink p {
+    margin: 5px 0;
+}
+
+.price {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.arrow-up {
+    color: #00ff00;
+    font-size: 1.2em;
+}
+
+.arrow-down {
+    color: #ff0000;
+    font-size: 1.2em;
+}
+
+.rollover {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffcc00;
+    color: #1a1a1a;
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1.1em;
+}
+
+.rollover span {
+    display: inline-block;
+    padding-right: 30px;
+    animation: scroll 20s linear infinite;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+button {
+    background-color: #ffcc00;
+    color: #1a1a1a;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #e6b800;
+}
