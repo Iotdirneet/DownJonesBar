@@ -1,66 +1,92 @@
-const drinks = [
-    { name: "Mojito", price: 6.50, prevPrice: 6.50 },
-    { name: "Caipirinha", price: 7.00, prevPrice: 7.00 },
-    { name: "Margarita", price: 8.00, prevPrice: 8.00 },
-    { name: "Piña Colada", price: 7.50, prevPrice: 7.50 },
-    { name: "Gin Tonic", price: 6.00, prevPrice: 6.00 },
-    { name: "Cerveza Artesanal", price: 4.50, prevPrice: 4.50 },
-    { name: "Sangría", price: 5.50, prevPrice: 5.50 },
-    { name: "Tequila Sunrise", price: 7.20, prevPrice: 7.20 },
-    { name: "Daiquiri", price: 6.80, prevPrice: 6.80 }
-];
+// Datos iniciales
+const drinks = {
+  cocktails: [
+    { name: "Mojito", price: 8.5 },
+    { name: "Margarita", price: 9.0 },
+    { name: "Piña Colada", price: 10.0 },
+    { name: "Cosmopolitan", price: 11.0 },
+    { name: "Old Fashioned", price: 12.0 },
+  ],
+  beers: [
+    { name: "Heineken", price: 4.0 },
+    { name: "Corona", price: 4.5 },
+    { name: "Estrella Damm", price: 5.0 },
+    { name: "Budweiser", price: 5.5 },
+    { name: "Stella Artois", price: 6.0 },
+  ],
+  nonAlcoholic: [
+    { name: "Limonada", price: 3.0 },
+    { name: "Agua Mineral", price: 2.0 },
+    { name: "Zumo de Naranja", price: 3.5 },
+    { name: "Coca-Cola", price: 2.5 },
+    { name: "Red Bull", price: 4.0 },
+  ],
+};
 
-const container = document.getElementById('drinks-container');
-const rollover = document.getElementById('rollover');
-
-function renderDrinks() {
-    container.innerHTML = '';
-    drinks.forEach(drink => {
-        const arrow = drink.price > drink.prevPrice ? '<span class="arrow-up">↑</span>' :
-                     drink.price < drink.prevPrice ? '<span class="arrow-down">↓</span>' : '';
-        const drinkElement = document.createElement('div');
-        drinkElement.className = 'drink';
-        drinkElement.innerHTML = `
-            <h3>${drink.name}</h3>
-            <p class="price">€${drink.price.toFixed(2)} ${arrow}</p>
-            <button onclick="buyDrink('${drink.name}')">Comprar</button>
-            <button onclick="sellDrink('${drink.name}')">Vender</button>
-        `;
-        container.appendChild(drinkElement);
-    });
-    updateRollover();
+// Función para actualizar el precio
+function updatePrice(drink) {
+  const change = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 0.1); // Cambio aleatorio de ±0.1
+  drink.price = parseFloat((drink.price + change).toFixed(2));
+  return drink.price;
 }
 
-function updateRollover() {
-    rollover.innerHTML = drinks.map(drink => 
-        `<span>${drink.name} | €${drink.price.toFixed(2)}</span>`
-    ).join('');
+// Renderizar bebidas
+function renderDrinks(category, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  drinks[category].forEach((drink) => {
+    const li = document.createElement("li");
+    const priceClass = drink.price > drink.oldPrice ? "price-up" : "price-down";
+    li.innerHTML = `
+      ${drink.name}
+      <span class="${priceClass}">
+        €${drink.price} ${drink.price > drink.oldPrice ? "▲" : "▼"}
+      </span>
+    `;
+    container.appendChild(li);
+    drink.oldPrice = drink.price; // Guardar el precio anterior
+  });
 }
 
-function buyDrink(name) {
-    const drink = drinks.find(d => d.name === name);
-    drink.prevPrice = drink.price;
-    drink.price += Math.random() * 0.5; // Sube precio al comprar
-    renderDrinks();
-}
-
-function sellDrink(name) {
-    const drink = drinks.find(d => d.name === name);
-    drink.prevPrice = drink.price;
-    drink.price -= Math.random() * 0.5; // Baja precio al vender
-    if (drink.price < 1) drink.price = 1; // Precio mínimo
-    renderDrinks();
-}
-
-// Actualizar precios aleatoriamente cada 10 segundos
+// Actualizar precios cada 2 minutos
 setInterval(() => {
-    drinks.forEach(drink => {
-        drink.prevPrice = drink.price;
-        const change = (Math.random() - 0.5) * 0.5;
-        drink.price = Math.max(1, drink.price + change);
-    });
-    renderDrinks();
-}, 10000);
+  Object.keys(drinks).forEach((category) => {
+    drinks[category].forEach(updatePrice);
+    renderDrinks(category, category === "cocktails" ? "cocktails" : category === "beers" ? "beers" : "non-alcoholic");
+  });
+}, 120000);
 
-// Render inicial
-renderDrinks();
+// Ticker inferior
+function updateTicker() {
+  const ticker = document.getElementById("ticker");
+  ticker.innerHTML = "";
+  Object.values(drinks).flat().forEach((drink) => {
+    const priceClass = drink.price > drink.oldPrice ? "price-up" : "price-down";
+    const span = document.createElement("span");
+    span.className = priceClass;
+    span.textContent = `${drink.name}: €${drink.price} ${drink.price > drink.oldPrice ? "▲" : "▼"} | `;
+    ticker.appendChild(span);
+  });
+}
+
+// Temporizador de crash
+let countdownTime = 900; // 15 minutos en segundos
+const countdownElement = document.getElementById("countdown");
+
+function updateCountdown() {
+  const minutes = Math.floor(countdownTime / 60);
+  const seconds = countdownTime % 60;
+  countdownElement.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  if (countdownTime <= 0) {
+    alert("¡CRASH DEL MERCADO!");
+    countdownTime = 900; // Reiniciar
+  } else {
+    countdownTime--;
+  }
+}
+
+// Inicialización
+Object.keys(drinks).forEach((category) => renderDrinks(category, category === "cocktails" ? "cocktails" : category === "beers" ? "beers" : "non-alcoholic"));
+updateTicker();
+setInterval(updateTicker, 5000); // Actualizar ticker cada 5 segundos
+setInterval(updateCountdown, 1000); // Actualizar temporizador cada segundo
